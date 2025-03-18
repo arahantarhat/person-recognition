@@ -1,45 +1,73 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './index.css';
 
 function App() {
-  const [file, setFile] = useState(null);
-  const [result, setResult] = useState("");
-  const [loading, setLoading] = useState(false); // Para mostrar un estado de carga mientras se sube la imagen
+  const [image, setImage] = useState(null);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
   };
 
   const handleUpload = async () => {
-    if (!file) return;
-  
-    setLoading(true); // Activar el estado de carga
+    if (!image) {
+      alert("Por favor, selecciona una imagen");
+      return;
+    }
+
+    setLoading(true);
+    setMessage('Cargando...');
+
     const formData = new FormData();
-    formData.append("image", file);
-    
-    console.log("Enviando imagen:", file.name);  // Verifica el archivo que se está enviando
-  
+    formData.append('image', image);
+
     try {
-      const response = await axios.post("http://localhost:5000/uploads", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await axios.post('http://localhost:5000/uploads', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      setResult(response.data.match);
-    } catch (error) {
-      console.error("Error al subir la imagen:", error);
-      setResult("❌ Ocurrió un error al procesar la imagen");
-    } finally {
+
       setLoading(false);
+      setMessage(response.data.match);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error al subir la imagen:", error);
+      setMessage("Error al subir la imagen. Intenta nuevamente.");
     }
   };
 
   return (
-    <div>
-      <h2>Reconocimiento de Personas</h2>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload} disabled={loading}>
-        {loading ? "Cargando..." : "Subir Imagen"}
-      </button>
-      <p>Resultado: {result}</p>
+    <div className="app">
+      <h1 className="app-title">Reconocimiento de Rostros</h1>
+
+      <div className="upload-container">
+        <input 
+          type="file" 
+          onChange={handleImageChange} 
+          className="file-input" 
+        />
+        <button 
+          onClick={handleUpload} 
+          className="upload-button"
+        >
+          Subir Imagen
+        </button>
+      </div>
+
+      {loading && (
+        <div className="loader">
+          <div className="loader-spinner"></div>
+        </div>
+      )}
+
+      {message && (
+        <div className={`message ${message.includes('❌') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
     </div>
   );
 }
