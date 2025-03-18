@@ -20,7 +20,7 @@ function App() {
     console.log("Enviando imagen:", file.name);  // Verifica el archivo que se está enviando
   
     try {
-      const response = await axios.post("http://localhost:5000/backend/uploads", formData, {
+      const response = await axios.post("http://localhost:5000/uploads", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResult(response.data.match);
