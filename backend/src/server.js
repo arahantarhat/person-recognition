@@ -1,14 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
+const express = require('express');
+const cors = require('cors'); // Para manejar los CORS
+const path = require('path');
+const app = require('./app'); // Importamos la configuración de las rutas y lógica desde app.js
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const port = 5000;
 
-app.get("/", (req, res) => {
-    res.send("Backend is running!");
+// Middleware global
+app.use(cors());  // Habilitar CORS
+
+// Servir archivos estáticos (si tienes archivos como imágenes, CSS, etc.)
+app.use(express.static(path.join(__dirname, './uploads')));
+
+// Iniciar el servidor
+app.listen(port, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
 });
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
